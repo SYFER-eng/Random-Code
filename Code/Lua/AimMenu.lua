@@ -85,8 +85,6 @@ local ESPObjects = {}
 local CombatTab = Window:NewTab("💥 Combat")
 local VisualTab = Window:NewTab("👁️ Visuals")
 local FOVTab = Window:NewTab("🔍 FOV")
-local SoftAimTab = Window:NewTab("🎯 Soft Aim")
-local MiscTab = Window:NewTab("⚙️ Misc")
 
 -- Combat Section
 local AimbotSection = CombatTab:NewSection("Universal Aimbot")
@@ -119,19 +117,8 @@ local function InitializeAimbotSection()
         end)
 end
 
--- Initialize Misc Section
-local CheatESPSection = MiscTab:NewSection("Cheat Detection")
-CheatESPSection:NewToggle("Cheater ESP", "Shows potential cheaters", function(state)
-    Settings.CheatESPEnabled = state
-end)
-
+-- Initialize Aimbot Section
 InitializeAimbotSection()
-
--- Soft Aim Section
-local SoftAimSection = SoftAimTab:NewSection("Soft Aim Settings")
-SoftAimSection:NewToggle("Enable Soft Aim", "Activate soft aim when holding left mouse button", function(state)
-    Settings.SoftAimEnabled = state
-end)
 
 -- Visual Section
 local ESPSection = VisualTab:NewSection("Universal ESP")
@@ -347,24 +334,6 @@ RunService.RenderStepped:Connect(function()
     end
 
     if Settings.AimbotEnabled and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
-        local target = GetClosestPlayer()
-        if target and target.Character then
-            local targetPart = FindFirstAvailablePart(target.Character, {
-                Settings.AimPart,
-                "Head",
-                "HumanoidRootPart",
-                "Torso",
-                "UpperTorso"
-            })
-
-            if targetPart then
-                local targetPos = targetPart.Position
-                Camera.CFrame = CFrame.new(Camera.CFrame.Position, targetPos)
-            end
-        end
-    end
-
-    if Settings.SoftAimEnabled and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
         local target = GetClosestPlayer()
         if target and target.Character then
             local targetPart = FindFirstAvailablePart(target.Character, {
