@@ -1,188 +1,284 @@
 local player = game.Players.LocalPlayer
 local mouse = player:GetMouse()
-local camera = workspace.CurrentCamera
+local tweenService = game:GetService("TweenService")
 local userInputService = game:GetService("UserInputService")
 local runService = game:GetService("RunService")
 
--- Create the main screen GUI
+-- GUI Creation
 local screenGui = Instance.new("ScreenGui")
-screenGui.Parent = game:GetService("CoreGui")  -- Set parent to CoreGui to overlay everything
-screenGui.ResetOnSpawn = false  -- Prevent resetting the GUI when respawning
+screenGui.Name = "SpeedHackPremium"
+screenGui.Parent = game:GetService("CoreGui")
+screenGui.ResetOnSpawn = false
 
--- Create the main window
+-- Main Window
 local mainWindow = Instance.new("Frame")
-mainWindow.Size = UDim2.new(0, 510, 0, 400)
-mainWindow.Position = UDim2.new(0.5, -255, 0.5, -200)
-mainWindow.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-mainWindow.BackgroundTransparency = 0.2
-mainWindow.Visible = true  -- Make it visible immediately
-mainWindow.ZIndex = 999  -- Set the ZIndex to a high value to overlay on top of everything
+mainWindow.Size = UDim2.new(0, 800, 0, 500)
+mainWindow.Position = UDim2.new(0.5, -400, 0.5, -250)
+mainWindow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+mainWindow.BorderSizePixel = 0
+mainWindow.Active = true
+mainWindow.Draggable = true
+mainWindow.ClipsDescendants = true
 mainWindow.Parent = screenGui
 
--- Title label
-local titleLabel = Instance.new("TextLabel")
-titleLabel.Size = UDim2.new(1, 0, 0, 30)
-titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "Roblox Speed Hack For Leroy Made By Syfer-eng"
-titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-titleLabel.TextSize = 18
-titleLabel.Font = Enum.Font.SourceSans
-titleLabel.ZIndex = 999  -- Set ZIndex to match main window
-titleLabel.Parent = mainWindow
+-- Add Shadow
+local shadow = Instance.new("ImageLabel")
+shadow.Size = UDim2.new(1.02, 0, 1.02, 0)
+shadow.Position = UDim2.new(-0.01, 0, -0.01, 0)
+shadow.BackgroundTransparency = 1
+shadow.Image = "rbxassetid://297774371"
+shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+shadow.ImageTransparency = 0.7
+shadow.Parent = mainWindow
 
--- Create Tabs
-local tabsFrame = Instance.new("Frame")
-tabsFrame.Size = UDim2.new(1, 0, 0, 40)
-tabsFrame.Position = UDim2.new(0, 0, 0, 30)
-tabsFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-tabsFrame.BackgroundTransparency = 0.5
-tabsFrame.ZIndex = 999  -- Set ZIndex to match main window
-tabsFrame.Parent = mainWindow
+-- Tabs Container
+local tabsContainer = Instance.new("Frame")
+tabsContainer.Size = UDim2.new(0, 200, 1, 0)
+tabsContainer.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+tabsContainer.Parent = mainWindow
 
--- Tab Buttons (only Speed and Unload)
-local speedTabButton = Instance.new("TextButton")
-speedTabButton.Size = UDim2.new(0, 170, 0, 40)
-speedTabButton.Position = UDim2.new(0, 0, 0, 0)
-speedTabButton.Text = "Speed"
-speedTabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-speedTabButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-speedTabButton.Font = Enum.Font.SourceSans
-speedTabButton.TextSize = 16
-speedTabButton.ZIndex = 999  -- Set ZIndex to match main window
-speedTabButton.Parent = tabsFrame
+-- Add Corner Radius to Main Window
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 10)
+mainCorner.Parent = mainWindow
 
-local unloadTabButton = Instance.new("TextButton")
-unloadTabButton.Size = UDim2.new(0, 170, 0, 40)
-unloadTabButton.Position = UDim2.new(0, 170, 0, 0)
-unloadTabButton.Text = "Unload"
-unloadTabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-unloadTabButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-unloadTabButton.Font = Enum.Font.SourceSans
-unloadTabButton.TextSize = 16
-unloadTabButton.ZIndex = 999  -- Set ZIndex to match main window
-unloadTabButton.Parent = tabsFrame
-
--- Create Sections
-local speedSection = Instance.new("Frame")
-speedSection.Size = UDim2.new(1, 0, 0, 250)
-speedSection.Position = UDim2.new(0, 0, 0, 70)
-speedSection.BackgroundTransparency = 0.3
-speedSection.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-speedSection.Visible = true  -- Make Speed section visible by default
-speedSection.ZIndex = 999  -- Set ZIndex to match main window
-speedSection.Parent = mainWindow
-
-local unloadSection = Instance.new("Frame")
-unloadSection.Size = UDim2.new(1, 0, 0, 250)
-unloadSection.Position = UDim2.new(0, 0, 0, 70)
-unloadSection.BackgroundTransparency = 0.3
-unloadSection.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-unloadSection.Visible = false  -- Unload section starts invisible
-unloadSection.ZIndex = 999  -- Set ZIndex to match main window
-unloadSection.Parent = mainWindow
-
--- Speed Input Box (Editable)
-local speedInputLabel = Instance.new("TextLabel")
-speedInputLabel.Size = UDim2.new(0, 200, 0, 30)
-speedInputLabel.Position = UDim2.new(0, 10, 0, 10)
-speedInputLabel.BackgroundTransparency = 1
-speedInputLabel.Text = "Speed: 16"
-speedInputLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-speedInputLabel.TextSize = 14
-speedInputLabel.ZIndex = 999  -- Set ZIndex to match main window
-speedInputLabel.Parent = speedSection
-
-local speedInputBox = Instance.new("TextBox")
-speedInputBox.Size = UDim2.new(0, 200, 0, 30)
-speedInputBox.Position = UDim2.new(0, 10, 0, 40)
-speedInputBox.Text = "16"
-speedInputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-speedInputBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-speedInputBox.Font = Enum.Font.SourceSans
-speedInputBox.TextSize = 14
-speedInputBox.ZIndex = 999  -- Set ZIndex to match main window
-speedInputBox.Parent = speedSection
-
--- Additional label for Universal Football default speed
-local normalSpeedLabel = Instance.new("TextLabel")
-normalSpeedLabel.Size = UDim2.new(0, 300, 0, 30)
-normalSpeedLabel.Position = UDim2.new(0, 220, 0, 40)
-normalSpeedLabel.BackgroundTransparency = 1
-normalSpeedLabel.Text = "Normal in Universal Football is 16"
-normalSpeedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-normalSpeedLabel.TextSize = 14
-normalSpeedLabel.Font = Enum.Font.SourceSans
-normalSpeedLabel.ZIndex = 999  -- Set ZIndex to match main window
-normalSpeedLabel.Parent = speedSection
-
-local speedValue = 16  -- Default speed
-
--- Update the player's speed based on the input
-local function updateSpeed()
-    local inputValue = tonumber(speedInputBox.Text)
-    if inputValue and inputValue > 0 and inputValue <= 100 then
-        speedValue = inputValue
-        player.Character:WaitForChild("Humanoid").WalkSpeed = speedValue
-        speedInputLabel.Text = "Speed: " .. speedValue
-    else
-        speedInputLabel.Text = "Speed: Invalid"
-    end
+-- Create Tab Button Function
+local function createTab(name, position)
+    local tab = Instance.new("TextButton")
+    tab.Size = UDim2.new(1, 0, 0, 50)
+    tab.Position = position
+    tab.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    tab.Text = name
+    tab.TextColor3 = Color3.fromRGB(255, 255, 255)
+    tab.Font = Enum.Font.GothamBold
+    tab.TextSize = 16
+    tab.Parent = tabsContainer
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = tab
+    
+    return tab
 end
 
--- When the user changes the text, update the speed
-speedInputBox.FocusLost:Connect(function()
-    updateSpeed()
+-- Create Tabs
+local speedTab = createTab("SPEED CONTROLLER", UDim2.new(0, 0, 0, 0))
+local unloadTab = createTab("UNLOAD SCRIPT", UDim2.new(0, 0, 0, 60))
+
+-- Content Frames
+local speedFrame = Instance.new("Frame")
+speedFrame.Size = UDim2.new(0, 600, 1, 0)
+speedFrame.Position = UDim2.new(0, 200, 0, 0)
+speedFrame.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+speedFrame.Visible = true
+speedFrame.Parent = mainWindow
+
+local unloadFrame = Instance.new("Frame")
+unloadFrame.Size = UDim2.new(0, 600, 1, 0)
+unloadFrame.Position = UDim2.new(0, 200, 0, 0)
+unloadFrame.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+unloadFrame.Visible = false
+unloadFrame.Parent = mainWindow
+
+-- Add Gradient to Frames
+local function addGradient(parent)
+    local gradient = Instance.new("UIGradient")
+    gradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(240, 240, 240))
+    })
+    gradient.Rotation = 45
+    gradient.Parent = parent
+end
+
+addGradient(speedFrame)
+addGradient(unloadFrame)
+
+-- Speed Control Elements
+local speedSlider = Instance.new("Frame")
+speedSlider.Size = UDim2.new(0.8, 0, 0, 6)
+speedSlider.Position = UDim2.new(0.1, 0, 0.4, 0)
+speedSlider.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+speedSlider.Parent = speedFrame
+
+local sliderHandle = Instance.new("TextButton")
+sliderHandle.Size = UDim2.new(0, 20, 0, 20)
+sliderHandle.Position = UDim2.new(0, -10, 0.5, -10)
+sliderHandle.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+sliderHandle.Text = ""
+sliderHandle.Parent = speedSlider
+
+-- Add Corner Radius to Slider Elements
+local sliderCorner = Instance.new("UICorner")
+sliderCorner.CornerRadius = UDim.new(0, 3)
+sliderCorner.Parent = speedSlider
+
+local handleCorner = Instance.new("UICorner")
+handleCorner.CornerRadius = UDim.new(1, 0)
+handleCorner.Parent = sliderHandle
+
+-- Speed Display
+local speedDisplay = Instance.new("TextLabel")
+speedDisplay.Size = UDim2.new(0, 200, 0, 30)
+speedDisplay.Position = UDim2.new(0.5, -100, 0.3, 0)
+speedDisplay.BackgroundTransparency = 1
+speedDisplay.Text = "Speed: 16"
+speedDisplay.TextColor3 = Color3.fromRGB(0, 0, 0)
+speedDisplay.TextSize = 24
+speedDisplay.Font = Enum.Font.GothamBold
+speedDisplay.Parent = speedFrame
+
+-- Unload Button
+local unloadButton = Instance.new("TextButton")
+unloadButton.Size = UDim2.new(0, 200, 0, 50)
+unloadButton.Position = UDim2.new(0.5, -100, 0.5, -25)
+unloadButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+unloadButton.Text = "UNLOAD SCRIPT"
+unloadButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+unloadButton.Font = Enum.Font.GothamBold
+unloadButton.TextSize = 18
+unloadButton.Parent = unloadFrame
+
+local unloadCorner = Instance.new("UICorner")
+unloadCorner.CornerRadius = UDim.new(0, 8)
+unloadCorner.Parent = unloadButton
+
+-- Enhanced Black Comet Effect
+local function createComet()
+    local comet = Instance.new("Frame")
+    comet.Size = UDim2.new(0, 4, 0, 4)
+    comet.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    comet.BorderSizePixel = 0
+    comet.Parent = mainWindow
+    
+    for i = 1, 5 do
+        local trail = Instance.new("Frame")
+        trail.Size = UDim2.new(0, 25 - (i * 4), 0, 3 - (i * 0.4))
+        trail.Position = UDim2.new(0, -(25 - (i * 4)), 0, 0.5)
+        trail.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        trail.BackgroundTransparency = 0.2 * i
+        trail.BorderSizePixel = 0
+        trail.Parent = comet
+        
+        local glow = Instance.new("ImageLabel")
+        glow.Size = UDim2.new(1.2, 0, 1.2, 0)
+        glow.Position = UDim2.new(-0.1, 0, -0.1, 0)
+        glow.BackgroundTransparency = 1
+        glow.Image = "rbxassetid://7331079227"
+        glow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+        glow.ImageTransparency = 0.5 + (0.1 * i)
+        glow.Parent = trail
+    end
+    
+    local startX = math.random(-50, 0)
+    local startY = math.random(0, mainWindow.AbsoluteSize.Y)
+    comet.Position = UDim2.new(0, startX, 0, startY)
+    
+    local endX = mainWindow.AbsoluteSize.X + 50
+    local endY = startY + math.random(100, 200)
+    
+    local tweenInfo = TweenInfo.new(
+        math.random(8, 12) / 10,
+        Enum.EasingStyle.Linear
+    )
+    
+    local tween = tweenService:Create(comet, tweenInfo, {
+        Position = UDim2.new(0, endX, 0, endY),
+        BackgroundTransparency = 1
+    })
+    
+    tween:Play()
+    tween.Completed:Connect(function()
+        comet:Destroy()
+    end)
+end
+
+-- Spawn Enhanced Comets
+spawn(function()
+    while wait(0.2) do
+        if mainWindow.Visible then
+            createComet()
+        end
+    end
 end)
 
--- Button Click Handlers
-unloadTabButton.MouseButton1Click:Connect(function()
-    screenGui:Destroy()
-    game:GetService("CoreGui"):FindFirstChild("RobloxGui"):ClearAllChildren()
+-- Speed Control Logic
+local dragging = false
+local minSpeed = 16
+local maxSpeed = 200
+local currentSpeed = minSpeed
+
+-- Store the current speed in Player Attributes to persist across resets
+player:SetAttribute("CurrentSpeed", currentSpeed)
+
+sliderHandle.MouseButton1Down:Connect(function()
+    dragging = true
+end)
+
+userInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
+runService.RenderStepped:Connect(function()
+    if dragging then
+        local mousePos = userInputService:GetMouseLocation()
+        local sliderPos = speedSlider.AbsolutePosition
+        local sliderSize = speedSlider.AbsoluteSize
+        
+        local relativeX = math.clamp((mousePos.X - sliderPos.X) / sliderSize.X, 0, 1)
+        sliderHandle.Position = UDim2.new(relativeX, -10, 0.5, -10)
+        
+        currentSpeed = math.floor(minSpeed + (maxSpeed - minSpeed) * relativeX)
+        speedDisplay.Text = "Speed: " .. currentSpeed
+        
+        local humanoid = player.Character and player.Character:FindFirstChild("Humanoid")
+        if humanoid then
+            humanoid.WalkSpeed = currentSpeed
+        end
+
+        -- Update the stored speed
+        player:SetAttribute("CurrentSpeed", currentSpeed)
+    end
 end)
 
 -- Tab Switching Logic
-speedTabButton.MouseButton1Click:Connect(function()
-    speedSection.Visible = true
-    unloadSection.Visible = false
+speedTab.MouseButton1Click:Connect(function()
+    speedFrame.Visible = true
+    unloadFrame.Visible = false
 end)
 
-unloadTabButton.MouseButton1Click:Connect(function()
-    speedSection.Visible = false
-    unloadSection.Visible = true
+unloadTab.MouseButton1Click:Connect(function()
+    speedFrame.Visible = false
+    unloadFrame.Visible = true
 end)
 
--- Make window draggable
-local draggingWindow = false
-local dragInput, dragStart, startPos
-
-mainWindow.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        draggingWindow = true
-        dragStart = input.Position
-        startPos = mainWindow.Position
+-- Unload Script Logic
+unloadButton.MouseButton1Click:Connect(function()
+    local humanoid = player.Character and player.Character:FindFirstChild("Humanoid")
+    if humanoid then
+        humanoid.WalkSpeed = 16
     end
+    screenGui:Destroy()
 end)
 
-mainWindow.InputChanged:Connect(function(input)
-    if draggingWindow and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local delta = input.Position - dragStart
-        mainWindow.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
-
-mainWindow.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        draggingWindow = false
-    end
-end)
-
--- Set initial speed
-updateSpeed()
-
--- Hide/Unhide the menu when Insert key is pressed
+-- Toggle GUI Visibility with Insert
 userInputService.InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    if input.KeyCode == Enum.KeyCode.Insert then
-        screenGui.Enabled = not screenGui.Enabled  -- Toggle visibility
+    if not gameProcessed and input.KeyCode == Enum.KeyCode.Insert then
+        screenGui.Enabled = not screenGui.Enabled
     end
+end)
+
+-- Initialize GUI State
+speedFrame.Visible = true
+unloadFrame.Visible = false
+mainWindow.Visible = true
+
+-- Restore speed on character respawn or reset
+player.CharacterAdded:Connect(function(character)
+    wait(1)  -- Allow some time for the character to load
+    local storedSpeed = player:GetAttribute("CurrentSpeed") or 16  -- Default to 16 if no speed is stored
+    local humanoid = character:WaitForChild("Humanoid")
+    humanoid.WalkSpeed = storedSpeed
 end)
